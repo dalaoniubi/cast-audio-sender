@@ -88,28 +88,27 @@ playerManager.setMessageInterceptor(
   }
 );
 
-// 监听播放控制事件
+// 监听播放控制事件 - 使用正确的事件类型
 playerManager.addEventListener(
-  cast.framework.events.EventType.PLAY,
+  cast.framework.events.EventType.PLAYING,
   () => {
-    logger.info('收到播放命令');
-    if (audioPlayer) audioPlayer.play();
+    logger.info('开始播放');
+    updateUI('正在播放', '音频');
   }
 );
 
 playerManager.addEventListener(
   cast.framework.events.EventType.PAUSE,
   () => {
-    logger.info('收到暂停命令');
-    if (audioPlayer) audioPlayer.pause();
+    logger.info('暂停播放');
+    updateUI('已暂停', '音频');
   }
 );
 
 playerManager.addEventListener(
-  cast.framework.events.EventType.SEEK_REQUESTED,
-  (event) => {
-    logger.info('收到跳转命令: ' + event.currentTime);
-    if (audioPlayer) audioPlayer.currentTime = event.currentTime;
+  cast.framework.events.EventType.SEEKING,
+  () => {
+    logger.info('正在跳转');
   }
 );
 
