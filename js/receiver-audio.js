@@ -24,13 +24,24 @@ function isValidUrl(string) {
   }
 }
 
+// 获取音频元素
+const audioPlayer = document.getElementById('audioPlayer');
+const statusEl = document.getElementById('status');
+const infoEl = document.getElementById('info');
+
+// 更新界面显示
+function updateUI(title, artist) {
+  if (statusEl) statusEl.textContent = title || '正在播放';
+  if (infoEl) infoEl.textContent = artist || '音频';
+}
+
 // 拦截 LOAD 请求
 playerManager.setMessageInterceptor(
   cast.framework.messages.MessageType.LOAD,
   request => {
     logger.info('收到播放请求');
 
-    const contentId = request.media.contentId;
+    const contentId = request.media.contentId || request.media.contentUrl;
     logger.info('Content ID: ' + contentId);
 
     // 直接播放 URL
@@ -54,6 +65,19 @@ playerManager.setMessageInterceptor(
       }
       request.media.metadata.title = request.media.metadata.title || '音频';
       
+      // 使用 HTML5 音频元素播放
+      if (audioPlayer) {
+        audioPlayer.src = contentId;
+        audioPlayer.play().then(() => {
+          logger.info('音频开始播放');
+        }).catch(err => {
+          logger.error('播放失败: ' + err);
+        });
+        
+        // 更新界面
+        updateUI(request.media.metadata.title, request.media.metadata.artist);
+      }
+      
       logger.info('准备播放: ' + contentId);
       return Promise.resolve(request);
     }
@@ -61,6 +85,31 @@ playerManager.setMessageInterceptor(
     // 无法识别的内容
     logger.error('无法识别的内容: ' + contentId);
     return Promise.reject(new Error('Unsupported content'));
+  }
+);
+
+// 监听播放控制事件
+playerManager.addEventListener(
+  cast.framework.events.EventType.PLAY,
+  () => {
+    logger.info('收到播放命令');
+    if (audioPlayer) audioPlayer.play();
+  }
+);
+
+playerManager.addEventListener(
+  cast.framework.events.EventType.PAUSE,
+  () => {
+    logger.info('收到暂停命令');
+    if (audioPlayer) audioPlayer.pause();
+  }
+);
+
+playerManager.addEventListener(
+  cast.framework.events.EventType.SEEK_REQUESTED,
+  (event) => {
+    logger.info('收到跳转命令: ' + event.currentTime);
+    if (audioPlayer) audioPlayer.currentTime = event.currentTime;
   }
 );
 

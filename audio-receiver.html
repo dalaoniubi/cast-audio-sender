@@ -38,9 +38,12 @@
 <body>
   <div class="container">
     <div class="logo">🎵</div>
-    <div class="status">音频接收器已就绪</div>
-    <div class="info">等待音频播放...</div>
+    <div class="status" id="status">音频接收器已就绪</div>
+    <div class="info" id="info">等待音频播放...</div>
   </div>
+  
+  <!-- 隐藏的音频元素 -->
+  <audio id="audioPlayer" style="display: none;"></audio>
   
   <script src="js/receiver-audio.js"></script>
 </body>
