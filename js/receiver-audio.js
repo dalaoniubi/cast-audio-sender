@@ -65,6 +65,10 @@ playerManager.setMessageInterceptor(
       }
       request.media.metadata.title = request.media.metadata.title || '音频';
       
+      // 保存当前播放信息
+      currentTitle = request.media.metadata.title;
+      currentArtist = request.media.metadata.artist || '';
+      
       // 使用 HTML5 音频元素播放
       if (audioPlayer) {
         audioPlayer.src = contentId;
@@ -75,7 +79,7 @@ playerManager.setMessageInterceptor(
         });
         
         // 更新界面
-        updateUI(request.media.metadata.title, request.media.metadata.artist);
+        updateUI(currentTitle, currentArtist);
       }
       
       logger.info('准备播放: ' + contentId);
@@ -88,12 +92,17 @@ playerManager.setMessageInterceptor(
   }
 );
 
+// 存储当前播放信息
+let currentTitle = '';
+let currentArtist = '';
+
 // 监听播放控制事件 - 使用正确的事件类型
 playerManager.addEventListener(
   cast.framework.events.EventType.PLAYING,
   () => {
     logger.info('开始播放');
-    updateUI('正在播放', '音频');
+    // 不覆盖歌曲信息，只更新状态
+    updateUI(currentTitle || '正在播放', currentArtist || '音频');
   }
 );
 
@@ -101,7 +110,7 @@ playerManager.addEventListener(
   cast.framework.events.EventType.PAUSE,
   () => {
     logger.info('暂停播放');
-    updateUI('已暂停', '音频');
+    updateUI(currentTitle || '已暂停', currentArtist || '音频');
   }
 );
 
