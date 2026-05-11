@@ -80,22 +80,6 @@ playerManager.setMessageInterceptor(
         
         // 更新界面
         updateUI(currentTitle, currentArtist);
-        
-        // 尝试回到前台（如果应用在后台）
-        try {
-          context.setApplicationState(
-            cast.framework.system.ApplicationState.RUNNING,
-            currentTitle
-          );
-          logger.info('应用已切换到前台');
-        } catch (e) {
-          logger.warn('无法切换到前台: ' + e);
-        }
-        
-        // 强制刷新界面显示
-        document.body.style.display = 'none';
-        document.body.offsetHeight; // 触发重排
-        document.body.style.display = '';
       }
       
       logger.info('准备播放: ' + contentId);
